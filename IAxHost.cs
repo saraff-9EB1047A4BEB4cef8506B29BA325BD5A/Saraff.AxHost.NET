@@ -47,8 +47,8 @@ namespace Saraff.AxHost {
         /// <summary>
         /// Возвращает или устанавливает имя пользовательского элемента управления.
         /// </summary>
-        /// <remarks>Имя имеет формат: "имя файла сборки"|"полное имя элемента управления"</remarks>
-        /// <example>MyAssembly.dll|MyNamespace.MyControl</example>
+        /// <remarks>Имя имеет формат: "имя файла сборки"!"полное имя элемента управления"</remarks>
+        /// <example>MyAssembly.dll!MyNamespace.MyControl</example>
         [DispId(0x60020001)]
         string ApplicationTypeName {
             [Description("Возвращает или устанавливает имя пользовательского элемента управления.")]
@@ -96,7 +96,7 @@ namespace Saraff.AxHost {
         /// Загружает и инициализирует компонент.
         /// </summary>
         [DispId(0x60020006)]
-        [Description("Загружает и инициализирует компонент, указанный в ApplicationControlName.")]
+        [Description("Загружает и инициализирует компонент, указанный в ApplicationTypeName.")]
         void Load();
 
         /// <summary>

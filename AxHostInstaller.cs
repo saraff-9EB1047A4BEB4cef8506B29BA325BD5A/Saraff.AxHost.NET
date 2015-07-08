@@ -53,6 +53,10 @@ namespace Saraff.AxHost {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Configuration.Install.Installer.AfterInstall"/> event.
+        /// </summary>
+        /// <param name="savedState">An <see cref="T:System.Collections.IDictionary"/> that contains the state of the computer after all the installers contained in the <see cref="P:System.Configuration.Install.Installer.Installers"/> property have completed their installations.</param>
         protected override void OnAfterInstall(IDictionary savedState) {
             try {
                 this._Install();
@@ -62,6 +66,10 @@ namespace Saraff.AxHost {
             base.OnAfterInstall(savedState);
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Configuration.Install.Installer.AfterUninstall"/> event.
+        /// </summary>
+        /// <param name="savedState">An <see cref="T:System.Collections.IDictionary"/> that contains the state of the computer after all the installers contained in the <see cref="P:System.Configuration.Install.Installer.Installers"/> property are uninstalled.</param>
         protected override void OnAfterUninstall(IDictionary savedState) {
             try {
                 this._Uninstall();
@@ -101,7 +109,7 @@ namespace Saraff.AxHost {
         private string _RegAsmPath {
             get {
                 Version _ver=Environment.Version;
-                return Path.Combine(Environment.SystemDirectory, string.Format("..\\Microsoft.NET\\Framework\\v{0}.{1}.{2}\\RegAsm.exe", _ver.Major, _ver.Minor, _ver.Build));
+                return Path.Combine(Environment.SystemDirectory,string.Format("..\\Microsoft.NET\\Framework{3}\\v{0}.{1}.{2}\\RegAsm.exe",_ver.Major,_ver.Minor,_ver.Build,IntPtr.Size!=4?"64":string.Empty));
             }
         }
 

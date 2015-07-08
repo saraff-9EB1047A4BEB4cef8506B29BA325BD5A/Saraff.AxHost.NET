@@ -96,13 +96,20 @@ namespace Saraff.AxHost.Core {
                     //копируем необходимые файлы
                     foreach(CustomAttributeData _attr_data in CustomAttributeData.GetCustomAttributes(_asm)) {
                         if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)) {
-                            this._CopyFile((string)_attr_data.ConstructorArguments[0].Value);
+                            var _reqFile=this._CopyFile((string)_attr_data.ConstructorArguments[0].Value);
+                            try {
+                                Assembly.ReflectionOnlyLoadFrom(_reqFile);
+                            } catch {
+                            }
                         }
                     }
-                    foreach(CustomAttributeData _attr_data in CustomAttributeData.GetCustomAttributes(_asm.GetType(_args[1]))) {
-                        if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)) {
-                            this._CopyFile((string)_attr_data.ConstructorArguments[0].Value);
+                    for(Type _type=_asm.GetType(_args[1]); _type!=null; ) {
+                        foreach(CustomAttributeData _attr_data in CustomAttributeData.GetCustomAttributes(_type)) {
+                            if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)) {
+                                this._CopyFile((string)_attr_data.ConstructorArguments[0].Value);
+                            }
                         }
+                        break;
                     }
 
                     #endregion
@@ -248,7 +255,14 @@ namespace Saraff.AxHost.Core {
         private string _AppDirectory {
             get {
                 if(this._appDirectory==null) {
-                    this._appDirectory=Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+                    var _asm=this.GetType().Assembly;
+                    var _name=_asm.GetName();
+                    var _subdir1=string.Format("{0}_{1}", _name.Name, _name.ProcessorArchitecture);
+                    var _subdir2=string.Format("{0}_{1}__", _asm.ImageRuntimeVersion, _name.Version);
+                    foreach(var _byte in _name.GetPublicKeyToken()) {
+                        _subdir2+=_byte.ToString("x2");
+                    }
+                    this._appDirectory=Path.Combine(Path.Combine(Path.Combine(Path.GetTempPath(), _subdir1), _subdir2), Guid.NewGuid().ToString());
                     Directory.CreateDirectory(this._appDirectory);
                 }
                 return this._appDirectory;

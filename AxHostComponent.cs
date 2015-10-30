@@ -167,6 +167,13 @@ namespace Saraff.AxHost {
 
         #endregion
 
+        protected override void Dispose(bool disposing) {
+            if(disposing&&this._components!=null) {
+                this._components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
         private void _container_FireEvent(object sender, ComponentContainer<ApplicationComponentAttribute>.FireEventArgs e) {
             if(this.FireEvent!=null) {
                 this.FireEvent(e.EventId);

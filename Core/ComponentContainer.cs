@@ -207,9 +207,9 @@ namespace Saraff.AxHost.Core {
         /// </summary>
         /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing) {
-                if(disposing&&this._components!=null) {
-                    this._components.Dispose();
-                }
+            if(disposing&&this._components!=null) {
+                this._components.Dispose();
+            }
             base.Dispose(disposing);
         }
 

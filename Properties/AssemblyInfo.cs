@@ -35,8 +35,8 @@ using System.Runtime.InteropServices;
 // General Information about an assemblyName is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assemblyName.
-[assembly: AssemblyTitle("Saraff.AxHost")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Saraff.AxHost.NET")]
+[assembly: AssemblyDescription("Provides hosting for custom components (.NET) in applications with unmanaged code.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SARAFF SOFTWARE")]
 [assembly: AssemblyProduct("Saraff.AxHost.NET")]
@@ -62,5 +62,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assemblyName: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.3.441")]
-[assembly: AssemblyFileVersion("1.0.3.441")]
+[assembly: AssemblyVersion("1.0.4.587")]
+[assembly: AssemblyFileVersion("1.0.4.587")]

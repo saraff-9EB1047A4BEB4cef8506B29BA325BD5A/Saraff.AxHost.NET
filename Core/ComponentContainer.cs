@@ -95,18 +95,26 @@ namespace Saraff.AxHost.Core {
                     _asm=Assembly.ReflectionOnlyLoadFrom(_targetFile);
                     //копируем необходимые файлы
                     foreach(CustomAttributeData _attr_data in CustomAttributeData.GetCustomAttributes(_asm)) {
-                        if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)) {
+                        Assembly _asm2;
+                        if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)&&!this._IsLoad((string)_attr_data.ConstructorArguments[0].Value,out _asm2)) {
                             var _reqFile=this._CopyFile((string)_attr_data.ConstructorArguments[0].Value);
                             try {
                                 Assembly.ReflectionOnlyLoadFrom(_reqFile);
+                                Assembly.LoadFrom(_reqFile);
                             } catch {
                             }
                         }
                     }
                     for(Type _type=_asm.GetType(_args[1]); _type!=null; ) {
                         foreach(CustomAttributeData _attr_data in CustomAttributeData.GetCustomAttributes(_type)) {
-                            if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)) {
-                                this._CopyFile((string)_attr_data.ConstructorArguments[0].Value);
+                            Assembly _asm2;
+                            if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)&&!this._IsLoad((string)_attr_data.ConstructorArguments[0].Value,out _asm2)) {
+                                var _reqFile = this._CopyFile((string)_attr_data.ConstructorArguments[0].Value);
+                                try {
+                                    Assembly.ReflectionOnlyLoadFrom(_reqFile);
+                                    Assembly.LoadFrom(_reqFile);
+                                } catch {
+                                }
                             }
                         }
                         break;

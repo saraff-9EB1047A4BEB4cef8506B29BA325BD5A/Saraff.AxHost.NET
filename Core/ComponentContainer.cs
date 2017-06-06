@@ -56,6 +56,7 @@ namespace Saraff.AxHost.Core {
         public ComponentContainer() {
             this.WorkingDirectory=Directory.GetCurrentDirectory();
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve+=this._ReflectionOnlyAssemblyResolve;
+            Assembly.ReflectionOnlyLoadFrom(this.GetType().Assembly.Location);
         }
 
         /// <summary>
@@ -84,49 +85,19 @@ namespace Saraff.AxHost.Core {
 
                 Assembly _asm;
                 if(!this._IsLoad(_args[0],out _asm)) {
-                    //копируем сборку, содержащую указанный компонент
-                    string _targetFile=this._CopyFile(_args[0]);
-
-                    #region копируем файлы, указанные в аттрибуте RequiredFileAttribute
-
-                    //т.к. необходимые для загрузки сборки зависимости еще отсутствуют,
-                    //сборка загружается в контекст, предназначенный только для отражения.
-                    Assembly.ReflectionOnlyLoadFrom(this.GetType().Assembly.Location);
-                    _asm=Assembly.ReflectionOnlyLoadFrom(_targetFile);
-                    //копируем необходимые файлы
-                    foreach(CustomAttributeData _attr_data in CustomAttributeData.GetCustomAttributes(_asm)) {
-                        Assembly _asm2;
-                        if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)&&!this._IsLoad((string)_attr_data.ConstructorArguments[0].Value,out _asm2)) {
-                            var _reqFile=this._CopyFile((string)_attr_data.ConstructorArguments[0].Value);
-                            try {
-                                Assembly.ReflectionOnlyLoadFrom(_reqFile);
-                                Assembly.LoadFrom(_reqFile);
-                            } catch {
-                            }
-                        }
-                    }
+                    _asm=this._LoadWithDependencies(_args[0]);
                     for(Type _type=_asm.GetType(_args[1]); _type!=null; ) {
                         foreach(CustomAttributeData _attr_data in CustomAttributeData.GetCustomAttributes(_type)) {
                             Assembly _asm2;
-                            if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)&&!this._IsLoad((string)_attr_data.ConstructorArguments[0].Value,out _asm2)) {
-                                var _reqFile = this._CopyFile((string)_attr_data.ConstructorArguments[0].Value);
-                                try {
-                                    Assembly.ReflectionOnlyLoadFrom(_reqFile);
-                                    Assembly.LoadFrom(_reqFile);
-                                } catch {
-                                }
+                            if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)&&!this._IsLoad((string)_attr_data.ConstructorArguments[0].Value, out _asm2)) {
+                                this._LoadWithDependencies((string)_attr_data.ConstructorArguments[0].Value);
                             }
                         }
                         break;
                     }
-
-                    #endregion
-
-                    //загружаем сборку и создаем экземпляр компонента
-                    this.ApplicationComponent=Activator.CreateInstance(Assembly.LoadFrom(_targetFile).GetType(_args[1])) as Component;
-                } else {
-                    this.ApplicationComponent=Activator.CreateInstance(_asm.GetType(_args[1])) as Component;
                 }
+                //создаем экземпляр компонента
+                this.ApplicationComponent=Activator.CreateInstance(_asm.GetType(_args[1])) as Component;
             } catch(TargetInvocationException ex) {
                 throw new InvalidOperationException((ex.InnerException!=null?ex.InnerException:ex).Message,ex);
             }
@@ -258,6 +229,38 @@ namespace Saraff.AxHost.Core {
             }
             assembly=null;
             return false;
+        }
+
+        private Assembly _LoadWithDependencies(string assemblyName) {
+            Assembly _asm=null;
+            if(!this._IsLoad(assemblyName, out _asm)) {
+                //копируем сборку, содержащую указанный компонент
+                string _targetFile=this._CopyFile(assemblyName);
+                try {
+
+                    #region копируем файлы, указанные в аттрибуте RequiredFileAttribute
+
+                    //т.к. необходимые для загрузки сборки зависимости еще отсутствуют,
+                    //сборка загружается в контекст, предназначенный только для отражения.
+                    _asm=Assembly.ReflectionOnlyLoadFrom(_targetFile);
+                    //копируем необходимые файлы
+                    foreach(CustomAttributeData _attr_data in CustomAttributeData.GetCustomAttributes(_asm)) {
+                        Assembly _asm2;
+                        if(_attr_data.ToString().Contains(typeof(RequiredFileAttribute).FullName)&&!this._IsLoad((string)_attr_data.ConstructorArguments[0].Value, out _asm2)) {
+                            this._LoadWithDependencies((string)_attr_data.ConstructorArguments[0].Value);
+                        }
+                    }
+
+                    #endregion
+
+                    return Assembly.LoadFrom(_targetFile);
+                } catch {
+                    if(_asm!=null) {
+                        throw;
+                    }
+                }
+            }
+            return _asm;
         }
 
         private string _AppDirectory {

@@ -1,9 +1,9 @@
 # Saraff.AxHost.NET
 Saraff.AxHost.NET Provides hosting for custom components (.NET) in applications with unmanaged code.
-To install Saraff.AxHost.NET, run the following command in the [Package Manager Console](https://docs.nuget.org/docs/start-here/using-the-package-manager-console)
 
 ![license: LGPL 3.0 or later](https://img.shields.io/badge/license-LGPL%203.0%20or%20later-blue?style=flat&logo=git)
 
+To install Saraff.AxHost.NET, run the following command in the [Package Manager Console](https://docs.nuget.org/docs/start-here/using-the-package-manager-console)
 ```
 PM> Install-Package Saraff.AxHost
 ```
